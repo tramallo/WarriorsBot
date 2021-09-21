@@ -10,8 +10,8 @@ module.exports =
         if(!message.content.startsWith(prefix) || message.author.bot) return
 
         //Se divide el mensaje segun sus espacios y se guarda el primer elemento (nombre del comando) en la variable command
-        const args = message.content.slice(prefix.length).trim().split('/ +/')
-        const commandName = args.shift().toLowerCase()
+        const args = message.content.slice(prefix.length).trim().split(/ +/);
+	    const commandName = args.shift().toLowerCase();
 
         //Se controla que exista un comando registrado con dicho nombre
         if(!client.commands.has(commandName)) return
