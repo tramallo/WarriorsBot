@@ -1,6 +1,7 @@
-const { MongoClient } = require('mongodb')
+const mongoose = require('mongoose')
+const userModel = require(`${__dirname}/../dbModels/userModel.js`)
 
-const URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWD}@warriorsbotdb.oqwsb.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
+const URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWD}@${process.env.CLUSTER_NAME}.oqwsb.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
 
 module.exports = 
 {
@@ -11,25 +12,21 @@ module.exports =
     usage: '',
     async execute(message, args)
     {
-        const db = new MongoClient(URI, { useNewUrlParser: true, useUnifiedTopology: true })
+        mongoose.connect(URI, { useNewUrlParser: true } )
 
-        try
-        {
-            await db.connect()
-            const dbList = await db.db().admin().listDatabases()
+        //Error control
+        mongoose.connection.on('error', error => { console.log(error) })
 
-            let reply = 'Databases:'
-            dbList.databases.forEach(db => reply += `\n- ${db.name}`)
+        //Connection successfull
+        mongoose.connection.on('open', () => 
+        {
+            console.log('connected')
+        })
 
-            message.channel.send(reply)
-        }
-        catch (e)
-        {
-            console.error(e)
-        }
-        finally
-        {
-            await db.close()
-        }
+        userModel.find({}, (err, res) => {
+            if(err) console.log("error in find() function")
+
+            console.log(res)
+        })
     }
 }
